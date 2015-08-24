@@ -26,49 +26,34 @@ for (k, v) in params.iteritems():
 def plot_style(ax, is_bar=False):
 
     if is_bar:
-        # No top, left, or right spines
         ax.spines['top'].set_visible(False)
         ax.spines['left'].set_visible(False)
         ax.spines['right'].set_visible(False)
 
-        # Spine linewidth
         ax.spines['bottom'].set_linewidth(0.75)
 
-        # Spine color
         ax.spines['bottom'].set_edgecolor('LightGray')
     else:
-        # No top or right spines
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
 
-        # Spine linewidth
         ax.spines['bottom'].set_linewidth(0.75)
         ax.spines['left'].set_linewidth(0.75)
 
-        # Spine color
         ax.spines['bottom'].set_edgecolor('#4B4B4B')
         ax.spines['left'].set_edgecolor('#4B4B4B')
 
-    # No ticks marks, ticklabel color, pad
     ax.tick_params(axis='both', top='off', bottom='off', left='off', right='off', colors='#4B4B4B', pad=10)
 
-    # Label color
     ax.xaxis.label.set_color('#4B4B4B')
     ax.yaxis.label.set_color('#4B4B4B')
 
 
 def range_frame(ax, x, y, fontsize):
-    """
-    SCALE BOUNDS TO FIGURE
-    ALSO:   WHAT HAPPENS WHEN THE MIN OR MAX VALUE IS CLOSE TO AN
-            ACTUAL TICK VALUE? E.g., 1800 and 1801 -> OVERLAP?
-    """
 
-    # Range: x
     xmin = x.min()
     xmax = x.max()
     
-    # Range: y
     ymin = y.min()
     ymax = y.max()
     
@@ -92,7 +77,6 @@ def range_frame(ax, x, y, fontsize):
     ylower = ymin - ((ymax - ymin) * 0.05)
     yupper = ymax + ((ymax - ymin) * 0.05)
     
-    # Axis limits
     ax.set_xlim(xmin=xlower, xmax=xupper)
     ax.set_ylim(ymin=ylower, ymax=yupper)
     
@@ -108,7 +92,6 @@ def auto_rotate_xticklabel(fig, ax):
     # Figure width (inches)
     figw = fig.get_figwidth()
     
-    # Number of ticks
     nticks = len(ax.xaxis.get_majorticklocs())
     
     # Spacing per tick (inches)
@@ -147,12 +130,6 @@ def to_nparray(container):
 
 def check_df(x, y, df):
 
-    """
-    A function to check whether a pd.DataFrame with column names has been passed in.
-    If not, can also take type: list, np.array, pd.Series.
-    Will return np.array() versions of x and y.
-    """
-
     if isinstance(df, pd.DataFrame):
         if type(x) is str and type(y) is str:
             x = df[x]
@@ -166,27 +143,6 @@ def check_df(x, y, df):
             raise TypeError('df must be a pd.DataFrame')
 
     return (to_nparray(x), to_nparray(y))
-
-
-def check_position(df, p):
-    if isinstance(df, pd.DataFrame):
-        if p is None:
-            return None
-        else:
-            if type(p) is str:
-                p = df[p]
-            else:
-                raise TypeError('p must be type str')
-    else:
-        if p is None:
-            pass
-        else:
-            if df is None:
-                pass
-            else:
-                raise TypeError('df must be a pd.DataFrame')
-
-    return p
 
 
 def scatter(x, y, df=None, figsize=(16, 8), marker='o', s=25, color='black', edgecolor='none', alpha=0.9, ticklabelsize=10):
@@ -205,11 +161,6 @@ def scatter(x, y, df=None, figsize=(16, 8), marker='o', s=25, color='black', edg
 
 
 def line(x, y, df=None, figsize=(16, 8), linestyle='tufte', linewidth=1.0, color='black', alpha=0.9, ticklabelsize=10, markersize=10, **kwargs):
-
-    """
-    This is the line plot function, which defaults to Tufte-style with circle markers.
-    If something other than 'tufte' is selected, let user set marker defaults.
-    """
 
     x, y = check_df(x, y, df)
 
@@ -265,7 +216,6 @@ def bar(position, height, df=None, label=None, align='center', color='LightGray'
 
     ax.set_xlim(xmin=xlist[0], xmax=xlist[-1])
 
-    # Is label provided?
     if label is None:
         pass
     elif type(label) in (list, np.ndarray, pd.Series):
