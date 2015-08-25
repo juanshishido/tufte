@@ -80,7 +80,6 @@ def range_frame(ax, x, y, fontsize):
     ax.set_xlim(xmin=xlower, xmax=xupper)
     ax.set_ylim(ymin=ylower, ymax=yupper)
     
-    # Faux axes lines
     ax.spines['bottom'].set_bounds(xmin, xmax)
     ax.spines['left'].set_bounds(ymin, ymax)
 
@@ -118,12 +117,12 @@ def auto_rotate_xticklabel(fig, ax):
 
 
 def to_nparray(container):
-    if type(container) in (list, pd.Series):
+    if type(container) in (list, pd.core.index.Int64Index, pd.Series):
         container = np.array(container)
     elif type(container) is np.ndarray:
         pass
     else:
-        raise ValueError('Container must be: list, np.array, or pd.Series')
+        raise ValueError('Container must be: list, np.array, pd.core.index.Int64Index, or pd.Series')
 
     return container
 
