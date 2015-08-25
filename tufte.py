@@ -144,6 +144,16 @@ def check_df(x, y, df):
     return (to_nparray(x), to_nparray(y))
 
 
+def valid_x(x):
+
+    if isinstance(x, pd.DataFrame):
+        return True
+    elif type(x) in (list, np.ndarray, pd.Series):
+        return True
+    else:
+        return False
+
+
 def scatter(x, y, df=None, figsize=(16, 8), marker='o', s=25, color='black', edgecolor='none', alpha=0.9, ticklabelsize=10):
 
     x, y = check_df(x, y, df)
@@ -230,3 +240,55 @@ def bar(position, height, df=None, label=None, align='center', color='LightGray'
         raise ValueError('Labels must be in: list, np.array, or pd.Series')
  
     return fig, ax
+
+
+def bplot(x):
+
+    if valid_x(x):
+
+        fig, ax = plt.subplots(figsize=(16, 8))
+
+        plot_style(ax, is_bar=False)
+
+        ax.spines['bottom'].set_visible(False) 
+
+        if isinstance(x, pd.DataFrame):
+
+            i_pos = []
+
+            for i, c in enumerate(x.columns):
+                tdf = np.array(x[[c]])
+                
+                v000 = tdf.min()
+                v025 = np.percentile(tdf, 25)
+                v050 = np.median(tdf)
+                v075 = np.percentile(tdf, 75)
+                v100 = tdf.max()
+                
+                ax.plot([i, i], [v000, v025], color='black', linewidth=0.5)
+                ax.plot([i, i], [v075, v100], color='black', linewidth=0.5)
+                ax.scatter([i], [v050], color='black', s=5)
+
+                i_pos.append(i)
+
+            ax.set_xticks(i_pos)
+            ax.set_xticklabels(x.columns)
+
+        elif type(x) in (list, np.ndarray, pd.Series):
+            x = to_nparray(x)
+            
+            v000 = x.min()
+            v025 = np.percentile(x, 25)
+            v050 = np.median(x)
+            v075 = np.percentile(x, 75)
+            v100 = x.max()
+
+            ax.plot([0, 0], [v000, v025], color='black', linewidth=0.5)
+            ax.plot([0, 0], [v075, v100], color='black', linewidth=0.5)
+            ax.scatter([0], [v050], color='black', s=5)
+
+            ax.axes.get_xaxis().set_visible(False)
+
+
+    else:
+        raise ValueError('x must be: list, np.array, pd.Series, or pd.DataFrame')
