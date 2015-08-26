@@ -23,30 +23,33 @@ for (k, v) in params.iteritems():
     plt.rcParams[k] = v
 
 
-def plot_style(ax, is_bar=False):
-
-    if is_bar:
-        ax.spines['top'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-
-        ax.spines['bottom'].set_linewidth(0.75)
-
-        ax.spines['bottom'].set_edgecolor('LightGray')
-    else:
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-
-        ax.spines['bottom'].set_linewidth(0.75)
-        ax.spines['left'].set_linewidth(0.75)
-
-        ax.spines['bottom'].set_edgecolor('#4B4B4B')
-        ax.spines['left'].set_edgecolor('#4B4B4B')
+def plot_style(ax, plot_type):
 
     ax.tick_params(axis='both', top='off', bottom='off', left='off', right='off', colors='#4B4B4B', pad=10)
 
     ax.xaxis.label.set_color('#4B4B4B')
     ax.yaxis.label.set_color('#4B4B4B')
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    if plot_type.lower() == 'bar':
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_linewidth(0.75)
+        ax.spines['bottom'].set_edgecolor('LightGray')
+
+    elif plot_type.lower() == 'bplot':
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+
+        ax.tick_params(axis='y', left='on')
+
+    elif plot_type.lower() in ('line', 'scatter'):
+        ax.spines['left'].set_linewidth(0.75)
+        ax.spines['bottom'].set_linewidth(0.75)
+
+        ax.spines['left'].set_edgecolor('#4B4B4B')
+        ax.spines['bottom'].set_edgecolor('#4B4B4B')
 
 
 def range_frame(ax, x, y, fontsize):
@@ -162,7 +165,7 @@ def scatter(x, y, df=None, figsize=(16, 8), marker='o', s=25, color='black', edg
 
     ax.scatter(x, y, marker=marker, s=s, color=color, edgecolor=edgecolor, alpha=alpha)
 
-    plot_style(ax, is_bar=False)
+    plot_style(ax, plot_type='scatter')
 
     ax = range_frame(ax, x, y, fontsize=ticklabelsize)
 
@@ -188,7 +191,7 @@ def line(x, y, df=None, figsize=(16, 8), linestyle='tufte', linewidth=1.0, color
     else:
         ax.plot(x, y, linestyle=linestyle, linewidth=linewidth, color=color, alpha=alpha, markersize=markersize ** 0.5, **kwargs)
 
-    plot_style(ax, is_bar=False)
+    plot_style(ax, plot_type='line')
 
     ax = range_frame(ax, x, y, fontsize=ticklabelsize)
 
@@ -203,7 +206,7 @@ def bar(position, height, df=None, label=None, align='center', color='LightGray'
 
     ax.bar(position, height, align=align, color=color, edgecolor=edgecolor, width=width)
 
-    plot_style(ax, is_bar=True)
+    plot_style(ax, plot_type='bar')
 
     xmin = position.min()
     xmax = position.max()
@@ -248,7 +251,7 @@ def bplot(x):
 
         fig, ax = plt.subplots(figsize=(16, 8))
 
-        plot_style(ax, is_bar=False)
+        plot_style(ax, plot_type='bplot')
 
         ax.spines['bottom'].set_visible(False) 
 
