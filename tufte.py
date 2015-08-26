@@ -163,9 +163,9 @@ def scatter(x, y, df=None, figsize=(16, 8), marker='o', s=25, color='black', edg
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    ax.scatter(x, y, marker=marker, s=s, color=color, edgecolor=edgecolor, alpha=alpha)
-
     plot_style(ax, plot_type='scatter')
+
+    ax.scatter(x, y, marker=marker, s=s, color=color, edgecolor=edgecolor, alpha=alpha)
 
     ax = range_frame(ax, x, y, fontsize=ticklabelsize)
 
@@ -177,6 +177,8 @@ def line(x, y, df=None, figsize=(16, 8), linestyle='tufte', linewidth=1.0, color
     x, y = check_df(x, y, df)
 
     fig, ax = plt.subplots(figsize=figsize)
+
+    plot_style(ax, plot_type='line')
 
     if linestyle == 'tufte':
 
@@ -191,22 +193,20 @@ def line(x, y, df=None, figsize=(16, 8), linestyle='tufte', linewidth=1.0, color
     else:
         ax.plot(x, y, linestyle=linestyle, linewidth=linewidth, color=color, alpha=alpha, markersize=markersize ** 0.5, **kwargs)
 
-    plot_style(ax, plot_type='line')
-
     ax = range_frame(ax, x, y, fontsize=ticklabelsize)
 
     return fig, ax
 
 
-def bar(position, height, df=None, label=None, align='center', color='LightGray', edgecolor='none', width=0.5, gridcolor='white'):
+def bar(position, height, df=None, label=None, figsize=(16, 8), align='center', color='LightGray', edgecolor='none', width=0.5, gridcolor='white'):
 
     position, height = check_df(position, height, df)
 
-    fig, ax = plt.subplots(figsize=(16, 8))
-
-    ax.bar(position, height, align=align, color=color, edgecolor=edgecolor, width=width)
+    fig, ax = plt.subplots(figsize=figsize)
 
     plot_style(ax, plot_type='bar')
+
+    ax.bar(position, height, align=align, color=color, edgecolor=edgecolor, width=width)
 
     xmin = position.min()
     xmax = position.max()
@@ -245,20 +245,17 @@ def bar(position, height, df=None, label=None, align='center', color='LightGray'
     return fig, ax
 
 
-def bplot(x):
+def bplot(x, figsize=(16, 8), auto_figsize=True):
 
     if valid_x(x):
 
-        fig, ax = plt.subplots(figsize=(16, 8))
+        fig, ax = plt.subplots(figsize=figsize)
 
         plot_style(ax, plot_type='bplot')
-
-        ax.spines['bottom'].set_visible(False) 
 
         if isinstance(x, pd.DataFrame):
 
             i_pos = []
-
             for i, c in enumerate(x.columns):
                 tdf = np.array(x[[c]])
                 
@@ -274,6 +271,8 @@ def bplot(x):
 
                 i_pos.append(i)
 
+            ax.set_xlim(min(i_pos) - 0.5, max(i_pos) + 0.5)
+
             ax.set_xticks(i_pos)
             ax.set_xticklabels(x.columns)
 
@@ -286,12 +285,23 @@ def bplot(x):
             v075 = np.percentile(x, 75)
             v100 = x.max()
 
+            if auto_figsize:
+                fig.set_size_inches(4, 8)
+            else:
+                pass
+
             ax.plot([0, 0], [v000, v025], color='black', linewidth=0.5)
             ax.plot([0, 0], [v075, v100], color='black', linewidth=0.5)
             ax.scatter([0], [v050], color='black', s=5)
 
             ax.axes.get_xaxis().set_visible(False)
 
+        xmin = x.min().min()
+        xmax = x.max().max()
+
+        x_range = xmax - xmin
+
+        ax.set_ylim(xmin - x_range * 0.05, xmax + x_range * 0.05)
 
     else:
         raise ValueError('x must be: list, np.array, pd.Series, or pd.DataFrame')
