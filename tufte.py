@@ -52,39 +52,52 @@ def plot_style(ax, plot_type):
         ax.spines['bottom'].set_edgecolor('#4B4B4B')
 
 
-def range_frame(ax, x, y, fontsize):
+def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
 
-    xmin = x.min()
-    xmax = x.max()
-    
-    ymin = y.min()
-    ymax = y.max()
-    
-    # Labels: x
-    xlabels = [int(xl) for xl in ax.xaxis.get_majorticklocs() if xl > xmin and xl < xmax]
-    xlabels = [xmin] + xlabels + [xmax]
-    ax.set_xticks(xlabels)
-    ax.set_xticklabels(xlabels, fontsize=fontsize)
-    
-    # Labels: y
-    ylabels = [int(yl) for yl in ax.yaxis.get_majorticklocs() if yl > ymin and yl < ymax]
-    ylabels = [ymin] + ylabels + [ymax]
-    ax.set_yticks(ylabels)
-    ax.set_yticklabels(ylabels, fontsize=fontsize)
-    
-    # Bounds: x
-    xlower = xmin - ((xmax - xmin) * 0.05)
-    xupper = xmax + ((xmax - xmin) * 0.05)
-    
-    # Bounds: y
-    ylower = ymin - ((ymax - ymin) * 0.05)
-    yupper = ymax + ((ymax - ymin) * 0.05)
-    
-    ax.set_xlim(xmin=xlower, xmax=xupper)
-    ax.set_ylim(ymin=ylower, ymax=yupper)
-    
-    ax.spines['bottom'].set_bounds(xmin, xmax)
-    ax.spines['left'].set_bounds(ymin, ymax)
+    PAD = 0.05
+
+    if dimension in ('x', 'both'):
+        assert x is not None, 'Must pass in x value'
+
+        xmin = int(x.min().min())
+        xmax = int(x.max().max())
+
+        xlower = xmin - ((xmax - xmin) * PAD)
+        xupper = xmax + ((xmax - xmin) * PAD)
+
+        ax.set_xlim(xmin=xlower, xmax=xupper)
+        ax.spines['bottom'].set_bounds(xmin, xmax)
+
+        xlabels = [int(xl) for xl in ax.xaxis.get_majorticklocs() if xl > xmin and xl < xmax]
+        xlabels = [xmin] + xlabels + [xmax]
+        ax.set_xticks(xlabels)
+        ax.set_xticklabels(xlabels, fontsize=fontsize)
+
+    if dimension in ('y', 'both'):
+        assert y is not None, 'Must pass in y value'
+
+        ymin = int(y.min().min())
+        ymax = int(y.max().max())
+
+        ylower = ymin - ((ymax - ymin) * PAD)
+        yupper = ymax + ((ymax - ymin) * PAD)
+
+        if is_bar:
+            ax.set_ylim(ymin=0, ymax=yupper) 
+            ax.spines['left'].set_bounds(0, ymax)
+
+            ylabels = [int(yl) for yl in ax.yaxis.get_majorticklocs() if yl < ymax]
+            ylabels = ylabels + [ymax]
+
+        else:
+            ax.set_ylim(ymin=ylower, ymax=yupper) 
+            ax.spines['left'].set_bounds(ymin, ymax)
+
+            ylabels = [int(yl) for yl in ax.yaxis.get_majorticklocs() if yl > ymin and yl < ymax]
+            ylabels = [ymin] + ylabels + [ymax]
+
+        ax.set_yticks(ylabels)
+        ax.set_yticklabels(ylabels, fontsize=fontsize)
 
     return ax
 
@@ -167,7 +180,7 @@ def scatter(x, y, df=None, figsize=(16, 8), marker='o', s=25, color='black', edg
 
     ax.scatter(x, y, marker=marker, s=s, color=color, edgecolor=edgecolor, alpha=alpha)
 
-    ax = range_frame(ax, x, y, fontsize=ticklabelsize)
+    ax = range_frame(ticklabelsize, ax, x, y, dimension='both')
 
     return fig, ax
 
@@ -193,12 +206,12 @@ def line(x, y, df=None, figsize=(16, 8), linestyle='tufte', linewidth=1.0, color
     else:
         ax.plot(x, y, linestyle=linestyle, linewidth=linewidth, color=color, alpha=alpha, markersize=markersize ** 0.5, **kwargs)
 
-    ax = range_frame(ax, x, y, fontsize=ticklabelsize)
+    ax = range_frame(ticklabelsize, ax, x, y, dimension='both')
 
     return fig, ax
 
 
-def bar(position, height, df=None, label=None, figsize=(16, 8), align='center', color='LightGray', edgecolor='none', width=0.5, gridcolor='white'):
+def bar(position, height, df=None, label=None, figsize=(16, 8), align='center', color='LightGray', edgecolor='none', width=0.5, gridcolor='white', ticklabelsize=10):
 
     position, height = check_df(position, height, df)
 
@@ -242,10 +255,12 @@ def bar(position, height, df=None, label=None, figsize=(16, 8), align='center', 
     else:
         raise ValueError('Labels must be in: list, np.array, or pd.Series')
  
+    ax = range_frame(ticklabelsize, ax, x=None, y=height, dimension='y', is_bar=True)
+
     return fig, ax
 
 
-def bplot(x, figsize=(16, 8), auto_figsize=True):
+def bplot(x, figsize=(16, 8), auto_figsize=True, ticklabelsize=10):
 
     if valid_x(x):
 
@@ -305,3 +320,7 @@ def bplot(x, figsize=(16, 8), auto_figsize=True):
 
     else:
         raise ValueError('x must be: list, np.array, pd.Series, or pd.DataFrame')
+
+    ax = range_frame(ticklabelsize, ax, x=None, y=x, dimension='y')
+
+    return fig, ax
