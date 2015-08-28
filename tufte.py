@@ -52,6 +52,25 @@ def plot_style(ax, plot_type):
         ax.spines['bottom'].set_edgecolor('#4B4B4B')
 
 
+def all_ints(x):
+
+    if type(x) not in (list, np.ndarray, pd.Series):
+        raise TypeError('Container must be of type: list, np.ndarray, or pd.Series')
+    
+    return sum([float(v).is_integer() for v in x]) == len(x)
+
+
+def cast_to(kind=float, x=None):
+    if kind == 'float':
+        x = [round(float(v), 1) for v in x]
+    elif kind == 'int':
+        x = [int(v) for v in x]
+    else:
+        raise TypeError('kind must be either float or int')
+
+    return x
+
+
 def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
 
     PAD = 0.05
@@ -59,8 +78,8 @@ def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
     if dimension in ('x', 'both'):
         assert x is not None, 'Must pass in x value'
 
-        xmin = int(x.min().min())
-        xmax = int(x.max().max())
+        xmin = x.min().min()
+        xmax = x.max().max()
 
         xlower = xmin - ((xmax - xmin) * PAD)
         xupper = xmax + ((xmax - xmin) * PAD)
@@ -68,16 +87,22 @@ def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
         ax.set_xlim(xmin=xlower, xmax=xupper)
         ax.spines['bottom'].set_bounds(xmin, xmax)
 
-        xlabels = [int(xl) for xl in ax.xaxis.get_majorticklocs() if xl > xmin and xl < xmax]
+        xlabels = [xl for xl in ax.xaxis.get_majorticklocs() if xl > xmin and xl < xmax]
         xlabels = [xmin] + xlabels + [xmax]
+
+        if all_ints(xlabels):
+            xlabels = cast_to('int', xlabels)
+        else:
+            xlabels = cast_to('float', xlabels)
+
         ax.set_xticks(xlabels)
         ax.set_xticklabels(xlabels, fontsize=fontsize)
 
     if dimension in ('y', 'both'):
         assert y is not None, 'Must pass in y value'
 
-        ymin = int(y.min().min())
-        ymax = int(y.max().max())
+        ymin = y.min().min()
+        ymax = y.max().max()
 
         ylower = ymin - ((ymax - ymin) * PAD)
         yupper = ymax + ((ymax - ymin) * PAD)
@@ -86,15 +111,20 @@ def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
             ax.set_ylim(ymin=0, ymax=yupper) 
             ax.spines['left'].set_bounds(0, ymax)
 
-            ylabels = [int(yl) for yl in ax.yaxis.get_majorticklocs() if yl < ymax]
+            ylabels = [yl for yl in ax.yaxis.get_majorticklocs() if yl < ymax]
             ylabels = ylabels + [ymax]
 
         else:
             ax.set_ylim(ymin=ylower, ymax=yupper) 
             ax.spines['left'].set_bounds(ymin, ymax)
 
-            ylabels = [int(yl) for yl in ax.yaxis.get_majorticklocs() if yl > ymin and yl < ymax]
+            ylabels = [yl for yl in ax.yaxis.get_majorticklocs() if yl > ymin and yl < ymax]
             ylabels = [ymin] + ylabels + [ymax]
+
+        if all_ints(ylabels):
+            ylabels = cast_to('int', ylabels)
+        else:
+            ylabels = cast_to('float', ylabels)
 
         ax.set_yticks(ylabels)
         ax.set_yticklabels(ylabels, fontsize=fontsize)
@@ -138,7 +168,7 @@ def to_nparray(container):
     elif type(container) is np.ndarray:
         pass
     else:
-        raise ValueError('Container must be: list, np.array, pd.core.index.Int64Index, or pd.Series')
+        raise TypeError('Container must be of type: list, np.ndarray, pd.core.index.Int64Index, or pd.Series')
 
     return container
 
@@ -253,7 +283,7 @@ def bar(position, height, df=None, label=None, figsize=(16, 8), align='center', 
         else:
             raise ValueError('Labels must have the same first dimension as position and height')
     else:
-        raise ValueError('Labels must be in: list, np.array, or pd.Series')
+        raise ValueError('Labels must be in: list, np.ndarray, or pd.Series')
  
     ax = range_frame(ticklabelsize, ax, x=None, y=height, dimension='y', is_bar=True)
 
@@ -319,7 +349,7 @@ def bplot(x, figsize=(16, 8), auto_figsize=True, ticklabelsize=10):
         ax.set_ylim(xmin - x_range * 0.05, xmax + x_range * 0.05)
 
     else:
-        raise ValueError('x must be: list, np.array, pd.Series, or pd.DataFrame')
+        raise TypeError('x must be type: list, np.ndarray, pd.Series, or pd.DataFrame')
 
     ax = range_frame(ticklabelsize, ax, x=None, y=x, dimension='y')
 
