@@ -54,6 +54,13 @@ def plot_style(ax, plot_type):
 
 def all_ints(x):
 
+    if isinstance(x, pd.DataFrame):
+        x_temp = []
+        for c in x.columns:
+            x_temp = x_temp + x[c].tolist()
+
+        x = x_temp
+
     if type(x) not in (list, np.ndarray, pd.Series):
         raise TypeError('Container must be of type: list, np.ndarray, or pd.Series')
     
@@ -61,6 +68,7 @@ def all_ints(x):
 
 
 def cast_to(kind=float, x=None):
+
     if kind == 'float':
         x = [round(float(v), 1) for v in x]
     elif kind == 'int':
