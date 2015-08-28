@@ -90,7 +90,7 @@ def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
         xlabels = [xl for xl in ax.xaxis.get_majorticklocs() if xl > xmin and xl < xmax]
         xlabels = [xmin] + xlabels + [xmax]
 
-        if all_ints(xlabels):
+        if all_ints(x):
             xlabels = cast_to('int', xlabels)
         else:
             xlabels = cast_to('float', xlabels)
@@ -121,7 +121,7 @@ def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
             ylabels = [yl for yl in ax.yaxis.get_majorticklocs() if yl > ymin and yl < ymax]
             ylabels = [ymin] + ylabels + [ymax]
 
-        if all_ints(ylabels):
+        if all_ints(y):
             ylabels = cast_to('int', ylabels)
         else:
             ylabels = cast_to('float', ylabels)
