@@ -266,7 +266,14 @@ def bar(position, height, df=None, label=None, figsize=(16, 8), align='center', 
     xlist = [xl for xl in ax.xaxis.get_majorticklocs() if xl >= xmin and xl <= xmax]
     xlist = [xmin - lower_buffer] + xlist[1:-1] + [xmax + upper_buffer]
 
-    for y in ax.yaxis.get_majorticklocs():
+    yticklocs = ax.yaxis.get_majorticklocs()
+
+    if all_ints(height):
+        yticklocs = cast_to('int', yticklocs)
+    else:
+        yticklocs = cast_to('float', yticklocs)
+
+    for y in yticklocs:
         ax.plot([xlist[0], xlist[-1]], [y, y], color=gridcolor, linewidth=1.25)
 
     ax.set_xlim(xmin=xlist[0], xmax=xlist[-1])
