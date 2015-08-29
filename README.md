@@ -1,6 +1,6 @@
 # Tufte in Python
 
-See the (Jupyter notebook)[https://github.com/juanshishido/tufte/blob/master/tufte-in-python.ipynb] for more detauls.
+See the [Jupyter notebook](https://github.com/juanshishido/tufte/blob/master/tufte-in-python.ipynb) for more detauls.
 
 A set of four plots based on Edward R. Tufte's designs in _The Visual Display of Quantitative Information_:
 
