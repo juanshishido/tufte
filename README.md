@@ -1,5 +1,7 @@
 # Tufte in Python
 
+See the (Jupyter notebook)[https://github.com/juanshishido/tufte/blob/master/tufte-in-python.ipynb] for more detauls.
+
 A set of four plots based on Edward R. Tufte's designs in _The Visual Display of Quantitative Information_:
 
 * bar
@@ -15,7 +17,7 @@ The "boxplot" (`bplot`), for example, removes boxes and caps and simply shows a 
 
 ![bplot](/images/bplot.png)
 
-The line and scatter plots make use of Tufte's _range-frame_ concept, which aim to make the frame (axis) lines "effective data-communicating element[s]" by showing the minimum and maximum values in each axis. The default line style uses a circle marker with gaps between line segments.
+The line and scatter plots make use of Tufte's _range-frame_ concept, which aims to make the frame (axis) lines "effective data-communicating element[s]" by showing the minimum and maximum values in each axis. The default line style uses a circle marker with gaps between line segments.
 
 ![line](/images/line.png)
 
@@ -23,4 +25,4 @@ The line and scatter plots make use of Tufte's _range-frame_ concept, which aim 
 
 This is built on top of `matplotlib`. This means other functions or methods can be used in conjunction with `tufte` plots.
 
-<font size=1>Note: plots shown for demonstration purposes only, thus no titles or axis labels are used.</font>
+Note: plots shown for demonstration purposes only, thus no titles or axis labels are used.
