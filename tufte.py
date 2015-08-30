@@ -41,24 +41,31 @@ def plot_style(ax, plot_type):
         ax.spines['left'].set_edgecolor('#4B4B4B')
         ax.spines['bottom'].set_edgecolor('#4B4B4B')
 
-def all_ints(x):
-    if isinstance(x, pd.DataFrame):
-        x_temp = []
-        for c in x.columns:
-            x_temp = x_temp + x[c].tolist()
-        x = x_temp
-    if type(x) not in (list, np.ndarray, pd.Series):
+def all_ints(data):
+    if isinstance(data, pd.DataFrame):
+        d_temp = []
+        for c in data.columns:
+            d_temp = d_temp + data[c].tolist()
+        data = d_temp
+    if type(data) not in (list, np.ndarray, pd.Series):
         raise TypeError('Container must be of type: list, np.ndarray, or pd.Series')
-    return sum([float(v).is_integer() for v in x]) == len(x)
+    return sum([float(v).is_integer() for v in data]) == len(data)
 
-def cast_to(kind=float, x=None):
+def cast_to(kind=float, labels=None):
     if kind == 'float':
-        x = [round(float(v), 1) for v in x]
+        labels = [round(float(v), 1) for v in labels]
     elif kind == 'int':
-        x = [int(v) for v in x]
+        labels = [int(v) for v in labels]
     else:
         raise TypeError('kind must be either float or int')
-    return x
+    return labels
+
+def convert_ticks(data, labels):
+    if all_ints(data):
+        labels = cast_to('int', labels)
+    else:
+        labels = cast_to('float', labels)
+    return labels
 
 def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
     PAD = 0.05
@@ -72,10 +79,7 @@ def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
         ax.spines['bottom'].set_bounds(xmin, xmax)
         xlabels = [xl for xl in ax.xaxis.get_majorticklocs() if xl > xmin and xl < xmax]
         xlabels = [xmin] + xlabels + [xmax]
-        if all_ints(x):
-            xlabels = cast_to('int', xlabels)
-        else:
-            xlabels = cast_to('float', xlabels)
+        xlabels = convert_ticks(x, xlabels)
         ax.set_xticks(xlabels)
         ax.set_xticklabels(xlabels, fontsize=fontsize)
     if dimension in ('y', 'both'):
@@ -94,10 +98,7 @@ def range_frame(fontsize, ax, x=None, y=None, dimension='both', is_bar=False):
             ax.spines['left'].set_bounds(ymin, ymax)
             ylabels = [yl for yl in ax.yaxis.get_majorticklocs() if yl > ymin and yl < ymax]
             ylabels = [ymin] + ylabels + [ymax]
-        if all_ints(y):
-            ylabels = cast_to('int', ylabels)
-        else:
-            ylabels = cast_to('float', ylabels)
+        ylabels = convert_ticks(y, ylabels)
         ax.set_yticks(ylabels)
         ax.set_yticklabels(ylabels, fontsize=fontsize)
     return ax
@@ -139,10 +140,10 @@ def check_df(x, y, df):
             raise TypeError('df must be a pd.DataFrame')
     return (to_nparray(x), to_nparray(y))
 
-def valid_x(x):
-    if isinstance(x, pd.DataFrame):
+def check_valid(data):
+    if isinstance(data, pd.DataFrame):
         return True
-    elif type(x) in (list, np.ndarray, pd.Series):
+    elif type(data) in (list, np.ndarray, pd.Series):
         return True
     else:
         return False
@@ -188,10 +189,7 @@ def bar(position, height, df=None, label=None, figsize=(16, 8), align='center', 
     xlist = [xl for xl in ax.xaxis.get_majorticklocs() if xl >= xmin and xl <= xmax]
     xlist = [xmin - lower_buffer] + xlist[1:-1] + [xmax + upper_buffer]
     yticklocs = ax.yaxis.get_majorticklocs()
-    if all_ints(height):
-        yticklocs = cast_to('int', yticklocs)
-    else:
-        yticklocs = cast_to('float', yticklocs)
+    yticklocs = convert_ticks(height, yticklocs)
     for y in yticklocs:
         ax.plot([xlist[0], xlist[-1]], [y, y], color=gridcolor, linewidth=1.25)
     ax.set_xlim(xmin=xlist[0], xmax=xlist[-1])
@@ -211,7 +209,7 @@ def bar(position, height, df=None, label=None, figsize=(16, 8), align='center', 
     return fig, ax
 
 def bplot(x, figsize=(16, 8), auto_figsize=True, ticklabelsize=10):
-    if valid_x(x):
+    if check_valid(x):
         fig, ax = plt.subplots(figsize=figsize)
         plot_style(ax, plot_type='bplot')
         if isinstance(x, pd.DataFrame):
